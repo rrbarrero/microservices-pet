@@ -22,6 +22,11 @@ def create_task_service() -> TaskService:
     return TaskService(repo=TaskInMemoryRepository())
 
 
+@app.get(get_api_url_with_prefix("/health"))
+async def health_check():
+    return {"status": "ok"}
+
+
 @app.post(get_api_url_with_prefix("/tasks"), status_code=201)
 async def create_task(payload: TaskPayload, service: TaskService = Depends(create_task_service)):
     new_task = Task.create(id=None, **payload.model_dump())
@@ -29,6 +34,7 @@ async def create_task(payload: TaskPayload, service: TaskService = Depends(creat
     await service.save(new_task)
 
     return {"message": "Task created successfully"}
+
 
 @app.get(get_api_url_with_prefix("/tasks"))
 async def get_tasks(service: TaskService = Depends(create_task_service)) -> list[Task]:

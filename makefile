@@ -4,9 +4,8 @@ up:
 build:
 	docker-compose build --no-cache
 
-
 test:
-	docker-compose run --rm node pytest
+	docker-compose run --rm node_service pytest
 
 post:
 	@curl -X POST "http://localhost:8000/api/v1/tasks" \
