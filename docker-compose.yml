@@ -1,0 +1,17 @@
+services:
+  gateway:
+    build:
+      context: api_gateway
+    command: sh -c "cd /code && ./run.sh"
+  node:
+    build:
+      context: node
+    # command: sh -c "cd /code && ./run.sh"
+    command: tail -f /dev/null
+    deploy:
+      replicas: 1
+    environment:
+      - VIRTUAL_ENV=/venv
+      - UV_PROJECT_ENVIRONMENT=/venv
+    volumes:
+      - ./node:/code
