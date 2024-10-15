@@ -29,3 +29,7 @@ async def create_task(payload: TaskPayload, service: TaskService = Depends(creat
     await service.save(new_task)
 
     return {"message": "Task created successfully"}
+
+@app.get(get_api_url_with_prefix("/tasks"))
+async def get_tasks(service: TaskService = Depends(create_task_service)) -> list[Task]:
+    return await service.get_all()

@@ -2,8 +2,8 @@ from domain.task import Task
 
 
 class TaskInMemoryRepository:
-    def __init__(self):
-        self.tasks: list[Task] = []
+    def __init__(self, initial_data: list[Task] = []):
+        self.tasks: list[Task] = initial_data
 
     async def save(self, task: Task):
         if task.id is None:

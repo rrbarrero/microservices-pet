@@ -31,10 +31,28 @@ class TestTaskApi:
             )
 
         return setup_test(act)
+    
+    @pytest.mark.asyncio
+    async def test_get_tasks(self):
+        def act(_: TaskService):
+            response = self.client.get("/api/v1/tasks")
+            assert response.status_code == 200
+            assert response.json() == [
+                {
+                    "id": 1,
+                    "title": "Test Task",
+                    "description": "This is a test task",
+                    "completed": False,
+                }
+            ]
+
+        initial_data = [Task(id=1, title="Test Task", description="This is a test task", completed=False)]
+        return setup_test(act, initial_data)
 
 
-def setup_test(act):
-    spy = TaskService(repo=TaskInMemoryRepository())
+
+def setup_test(act, initial_data: list[Task] = []):
+    spy = TaskService(repo=TaskInMemoryRepository(initial_data))
 
     app.dependency_overrides[create_task_service] = lambda: spy
 
