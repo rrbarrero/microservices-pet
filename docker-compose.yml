@@ -3,15 +3,25 @@ services:
     build:
       context: api_gateway
     command: sh -c "cd /code && ./run.sh"
-  node:
+    ports:
+      - 8000:8000
+    networks:
+      - backend_network
+  node_service:
     build:
       context: node
-    # command: sh -c "cd /code && ./run.sh"
-    command: tail -f /dev/null
+    command: sh -c "cd /code && ./run.sh"
+    # command: tail -f /dev/null
     deploy:
-      replicas: 1
+      replicas: 2
     environment:
       - VIRTUAL_ENV=/venv
       - UV_PROJECT_ENVIRONMENT=/venv
+      - PORT=8000
     volumes:
       - ./node:/code
+    networks:
+      - backend_network
+
+networks:
+  backend_network:

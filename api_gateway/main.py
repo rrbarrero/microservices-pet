@@ -8,8 +8,7 @@ app = FastAPI()
 
 # Lista de réplicas de los microservicios
 service_replicas = [
-    "http://localhost:8001",  # Réplica 1 del servicio de tareas
-    "http://localhost:8002",  # Réplica 2 del servicio de tareas
+    "http://node_service:8000",  # Réplica 1 del servicio de tareas
 ]
 
 # Iterador para balanceo de carga Round-Robin

@@ -1,6 +1,5 @@
 up:
-	docker-compose up -d
-	docker-compose logs -f
+	docker-compose up --build --scale node_service=2
 
 build:
 	docker-compose build --no-cache
@@ -8,3 +7,9 @@ build:
 
 test:
 	docker-compose run --rm node pytest
+
+post:
+	@curl -X POST "http://localhost:8000/api/v1/tasks" \
+		-H "Content-Type: application/json" \
+		-d "{\"title\": \"Test Task\", \"description\": \"This is a test task\", \"completed\": false}"
+
