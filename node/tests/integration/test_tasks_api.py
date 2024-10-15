@@ -26,6 +26,7 @@ class TestTaskApi:
             assert spy.repo.tasks[0] == Task(
                 id=1,
                 title="Test Task",
+                created_at=spy.repo.tasks[0].created_at,
                 description="This is a test task",
                 completed=False,
             )
@@ -41,12 +42,16 @@ class TestTaskApi:
                 {
                     "id": 1,
                     "title": "Test Task",
+                    "created_at": 1729006358.355708,
                     "description": "This is a test task",
                     "completed": False,
                 }
             ]
 
-        initial_data = [Task(id=1, title="Test Task", description="This is a test task", completed=False)]
+        initial_data = [Task(id=1, title="Test Task", 
+                             created_at=1729006358.355708, 
+                             description="This is a test task", 
+                             completed=False)]
         return setup_test(act, initial_data)
 
 
