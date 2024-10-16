@@ -1,49 +1,45 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 import httpx
+from config import SERVICE_NAME, log
+from etcd_client.client import EtcdClient
+from health_check import health_check
 
 import itertools
 
 app = FastAPI()
 
-# Lista de réplicas de los microservicios
-service_replicas = [
-    "http://node_service:8000",  # Réplica 1 del servicio de tareas
-]
+store_client = EtcdClient()
+health_check.start(store_client)
 
-# Iterador para balanceo de carga Round-Robin
+def to_url(services: list[dict]):
+    return [f"http://{x['address']}:{x['port']}" for x in services]
+
+service_replicas = to_url(store_client.get_services(SERVICE_NAME))
+
 replica_cycle = itertools.cycle(service_replicas)
 
-# Middleware de autenticación (opcional)
 @app.middleware("http")
 async def authenticate_request(request: Request, call_next):
-    # Aquí puedes implementar la lógica de autenticación
-    # Por ejemplo, verificar un token JWT en las cabeceras
-    # Si la autenticación falla, puedes lanzar un HTTPException
 
-    # Ejemplo simplificado (omitimos autenticación)
+    # Simplified example (we omit authentication)
     response = await call_next(request)
     return response
 
-# Ruta genérica para redirigir solicitudes
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy(request: Request, path: str):
-    # Obtener la URL de la réplica siguiente en el ciclo
+    
     replica_url = next(replica_cycle)
+    log.debug(f"\n{replica_url=}\n")
 
-    # Construir la URL completa
     url = f"{replica_url}/{path}"
 
-    # Obtener el método HTTP de la solicitud
     method = request.method
 
-    # Extraer el cuerpo de la solicitud
     body = await request.body()
 
-    # Extraer las cabeceras
     headers = dict(request.headers)
 
-    # Crear una nueva solicitud al servicio de destino
     async with httpx.AsyncClient() as client:
         try:
             response = await client.request(
@@ -55,7 +51,6 @@ async def proxy(request: Request, path: str):
                 timeout=5.0
             )
 
-            # Construir la respuesta para el cliente
             return JSONResponse(
                 status_code=response.status_code,
                 content=response.json(),
@@ -63,17 +58,14 @@ async def proxy(request: Request, path: str):
             )
 
         except httpx.RequestError as e:
-            # Manejar errores de conexión
-            raise HTTPException(status_code=502, detail="Error al conectar con el servicio de backend")
+            raise HTTPException(status_code=502, detail="Error connecting to backend service")
 
         except httpx.HTTPStatusError as e:
-            # Manejar respuestas HTTP de error
             raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
 
-# Manejo de excepciones generales
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
-        content={"detail": "Error interno del servidor"}
+        content={"detail": "Internal Server Error"}
     )

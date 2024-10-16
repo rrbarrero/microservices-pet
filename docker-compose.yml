@@ -1,4 +1,19 @@
 services:
+  etcd:
+    image: bitnami/etcd:3.5.16
+    networks:
+      - backend_network
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://localhost:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health", "--endpoints=http://localhost:2379"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+      
   gateway:
     build:
       context: api_gateway
@@ -7,11 +22,18 @@ services:
       - 8000:8000
     networks:
       - backend_network
+    environment:
+      - VIRTUAL_ENV=/venv
+      - UV_PROJECT_ENVIRONMENT=/venv
+    volumes:
+      - ./api_gateway:/code
+    depends_on:
+      - etcd
+
   node_service:
     build:
       context: node
     command: sh -c "cd /code && ./run.sh"
-    # command: tail -f /dev/null
     deploy:
       replicas: 2
     environment:
@@ -22,6 +44,8 @@ services:
       - ./node:/code
     networks:
       - backend_network
+    depends_on:
+      - etcd
 
 networks:
   backend_network:
