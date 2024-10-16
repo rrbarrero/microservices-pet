@@ -6,6 +6,7 @@ build:
 
 test:
 	docker-compose run --rm node_service pytest
+	docker-compose run --rm gateway pytest
 
 post:
 	@curl -X POST "http://localhost:8000/api/v1/tasks" \
