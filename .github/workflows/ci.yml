@@ -42,7 +42,7 @@ jobs:
 
       - name: Build Docker images
         run: |
-          make build
+          docker-compose build --no-cache
 
       - name: Test e2e
         run: |
