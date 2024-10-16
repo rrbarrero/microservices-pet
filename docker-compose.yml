@@ -46,6 +46,15 @@ services:
       - backend_network
     depends_on:
       - etcd
+  
+  e2e:
+    build:
+      context: e2e
+    volumes:
+      - ./e2e:/code
+    networks:
+      - backend_network
+    command: pytest
 
 networks:
   backend_network:
