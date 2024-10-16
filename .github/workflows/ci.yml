@@ -42,11 +42,11 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker-compose build --no-cache
+          docker compose build --no-cache
 
       - name: Test e2e
         run: |
-          docker-compose up -d --build --scale node_service=2 etcd gateway node_service
+          docker compose up -d --build --scale node_service=2 etcd gateway node_service
           sleep 40
-          docker-compose run --rm e2e
-          docker-compose down
+          docker compose run --rm e2e
+          docker compose down
