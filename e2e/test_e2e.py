@@ -25,6 +25,11 @@ class TestE2E:
                 "completed": "false",
             }
         response = self.client.post(site_url, json=task_data)
-        
+
         assert response.status_code == 201
+
+        response = self.client.get(site_url)
+
+        assert response.status_code == 200
+        assert len(response.json()) == 1
         
