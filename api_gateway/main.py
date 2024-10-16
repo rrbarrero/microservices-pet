@@ -28,10 +28,10 @@ async def authenticate_request(request: Request, call_next):
 async def proxy(request: Request, path: str):
     
     replicas = to_url(store_client.get_services(SERVICE_NAME))
-    replica_url = random.choice(replicas)
-    log.debug(f"\n{replica_url=}\n")
+    selected_replica = random.choice(replicas)
+    log.debug(f"\n{selected_replica=}\n")
 
-    url = f"{replica_url}/{path}"
+    url = f"{selected_replica}/{path}"
 
     method = request.method
 
