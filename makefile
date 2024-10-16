@@ -1,5 +1,5 @@
 up:
-	docker-compose up --build --scale node_service=2
+	docker-compose up --build --scale node_service=4
 
 build:
 	docker-compose build --no-cache

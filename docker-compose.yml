@@ -35,7 +35,7 @@ services:
       context: node
     command: sh -c "cd /code && ./run.sh"
     deploy:
-      replicas: 2
+      replicas: 4
     environment:
       - VIRTUAL_ENV=/venv
       - UV_PROJECT_ENVIRONMENT=/venv
