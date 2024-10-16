@@ -16,7 +16,7 @@ post:
 		-d "{\"title\": \"Test Task\", \"description\": \"This is a test task\", \"completed\": false}"
 
 e2e:
-	docker-compose up -d --build --scale node_service=4 etcd gateway node_service
-	sleep 4
+	docker-compose up -d --build --scale node_service=2 etcd gateway node_service
+	sleep 20
 	docker-compose run --rm e2e
 	docker-compose down

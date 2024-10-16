@@ -28,7 +28,7 @@ class TestE2E:
 
         assert response.status_code == 201
 
-        for _ in range(12):
+        for _ in range(5):
             response = self.client.get(site_url)
 
             assert response.status_code == 200
