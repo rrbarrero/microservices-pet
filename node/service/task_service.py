@@ -1,3 +1,4 @@
+from domain.task import Task
 from repos.task_repository import TaskRepository
 
 
@@ -8,5 +9,5 @@ class TaskService:
     async def save(self, task):
         await self.repo.save(task)
 
-    async def get_all(self) -> list:
+    async def get_all(self) -> list[Task]:
         return await self.repo.get_all()
